@@ -29,12 +29,7 @@ class _GamepadPageState extends State<GamepadPage> {
 
   Future<void> _onPressed(String txt) async {
     var services = await widget.device.discoverServices();
-    await ledPixels(services, LED_ERROR);
-    sleep(Duration(seconds: 1));
-    await ledPixels(services, LED_CLAER);
-    sleep(Duration(seconds: 1));
     await uartSend(services, txt);
-    sleep(Duration(seconds: 3));
   }
 
   @override
@@ -55,78 +50,67 @@ class _GamepadPageState extends State<GamepadPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Table(
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              children: _renderTable())
-        ],
+      body: Center(
+        child: Column(
+          children: [
+            Table(
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                children: _renderArrow()),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _renderTableItem(int row, int col) {
-    switch (col) {
-      case 0:
-        switch (row) {
-          case 0:
-            return Text("$col$row");
-          case 1:
-            return IconButton(
-              onPressed: () => _onPressed("UP"),
-              icon: Icon(Icons.arrow_upward),
-              iconSize: 64,
-            );
-          case 2:
-            return Text("$col$row");
-          default:
-        }
-        break;
-      case 1:
-        switch (row) {
-          case 0:
-            return IconButton(
-              onPressed: () => _onPressed("LEFT"),
-              icon: Icon(Icons.arrow_left),
-              iconSize: 64,
-            );
-          case 1:
-            return Text("$col$row");
-          case 2:
-            return IconButton(
-              onPressed: () => _onPressed("RIGHT"),
-              icon: Icon(Icons.arrow_right),
-              iconSize: 64,
-            );
-          default:
-        }
-        break;
-      case 2:
-        switch (row) {
-          case 0:
-            return Text("$col$row");
-          case 1:
-            return IconButton(
-              onPressed: () => _onPressed("DOWN"),
-              icon: Icon(Icons.arrow_downward),
-              iconSize: 64,
-            );
-          case 2:
-            return Text("$col$row");
-          default:
-        }
+  List<Widget> _renderRowItem(List<String> _items) {
+    var btnIcons = {
+      "up": Icons.arrow_upward,
+      "down": Icons.arrow_downward,
+      "left": Icons.arrow_back,
+      "right": Icons.arrow_forward,
+      "1": Icons.looks_one,
+      "2": Icons.looks_two,
+      "3": Icons.looks_3,
+      "4": Icons.looks_4,
+      "start": Icons.play_arrow,
+      "stop": Icons.stop,
+    };
+    var btnColors = {
+      "1": Colors.deepOrange,
+      "2": Colors.deepOrange,
+      "3": Colors.deepPurple,
+      "4": Colors.deepPurple,
+      "start": Colors.green,
+      "stop": Colors.red,
+    };
+    List<Widget> items = [];
+    for (var item in _items) {
+      if (item == "") {
+        items.add(Text(""));
+      } else if (item == "-") {
+        items.add(Text(""));
+      } else {
+        items.add(IconButton(
+          onPressed: () => _onPressed(item),
+          icon: Icon(btnIcons[item]),
+          color: btnColors[item],
+          iconSize: 48,
+        ));
+      }
     }
-    return Text("");
+    return items;
   }
 
-  List<TableRow> _renderTable() {
+  List<TableRow> _renderArrow() {
     List<TableRow> items = [];
-    for (var col = 0; col < 3; col++) {
-      items.add(TableRow(children: [
-        _renderTableItem(0, col),
-        _renderTableItem(1, col),
-        _renderTableItem(2, col),
-      ]));
+    var rowItems = [
+      ["", "up", "", "-", "-", "", "1", ""],
+      ["left", "", "right", "-", "-", "2", "", "3"],
+      ["", "down", "", "-", "-", "", "4", ""],
+      ["", "", "", "start", "stop", "", "", ""],
+    ];
+    for (var row in rowItems) {
+      items.add(TableRow(children: _renderRowItem(row)));
     }
     return items;
   }

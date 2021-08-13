@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Mico:Bit'),
     );
   }
 }
@@ -57,6 +57,9 @@ class _MyHomePageState extends State<MyHomePage> {
       allBlueNameAry.clear();
       setState(() {});
       for (ScanResult r in results) {
+        if (r.device.name.indexOf("micro:bit") <= 0) {
+          continue;
+        }
         scanResults[r.device.name] = r;
         if (r.device.name.length > 0) {
           print('${r.device.name} found! rssi: ${r.rssi}');

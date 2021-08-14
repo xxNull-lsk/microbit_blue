@@ -1,13 +1,13 @@
 # 简介
 
-通过蓝牙遥控micro:bit的程序。
+通过蓝牙遥控micro:bit的程序。  
 
 ## 使用方法
 
 ### 配对
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;使用前需要先配对。配对方法：
-先在[makecode](https://makecode.microbit.org/)的项目设定中将蓝牙连接方式设置为“JustWorks pairing (default): Pairing is automatic once the pairing is initiated.”。
-注意：理论上设置成“No Pairing Required: Anyone can connect via Bluetooth.”就不需要配对，可以任意连接了。但是，实际上并不好用。经常出现找不到蓝牙设备的情况。
+先在[makecode](https://makecode.microbit.org/)的项目设定中将蓝牙连接方式设置为“JustWorks pairing (default): Pairing is automatic once the pairing is initiated.”。  
+注意：理论上设置成“No Pairing Required: Anyone can connect via Bluetooth.”就不需要配对，可以任意连接了。但是，实际上并不好用。经常出现找不到蓝牙设备的情况。  
 - 关机状态配对
     1. 按住A和B按钮不放。
     2. （通电）打开Micro:bit。
@@ -41,10 +41,10 @@
 |▇|end||  
 
 ### Micro:bit范例程序
-1. 添加蓝牙扩展，位置：【高级】==>【扩展】
+1. 添加蓝牙扩展，位置：【高级】==>【扩展】  
    搜索“bluetooth”,点击“bluetooth services”。
    
-2. 编写代码
+2. 编写代码  
    ![代码](res/3.png)
 
    下载地址：[microbit-bluetooth_demo.hex](res/microbit-bluetooth_demo.hex)

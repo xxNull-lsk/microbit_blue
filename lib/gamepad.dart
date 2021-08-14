@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:orientation/orientation.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'microbit.dart';
 
@@ -19,16 +18,28 @@ class GamepadPage extends StatefulWidget {
 class _GamepadPageState extends State<GamepadPage> {
   void initState() {
     super.initState();
+    //隐藏状态栏和导航栏
+    SystemChrome.setEnabledSystemUIOverlays([]);
+
+    //隐藏底部导航栏
+    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
+
+    //隐藏状态栏
+    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
     OrientationPlugin.forceOrientation(DeviceOrientation.landscapeRight);
   }
 
   void deactivate() {
     super.deactivate();
     OrientationPlugin.forceOrientation(DeviceOrientation.portraitUp);
+    //恢复默认
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
   }
 
   Future<void> _onPressed(String txt) async {
     var services = await widget.device.discoverServices();
+    Fluttertoast.showToast(msg: txt);
+
     await uartSend(services, txt);
   }
 
@@ -104,6 +115,7 @@ class _GamepadPageState extends State<GamepadPage> {
   List<TableRow> _renderArrow() {
     List<TableRow> items = [];
     var rowItems = [
+      ["", "", "", "-", "-", "", "", ""],
       ["", "up", "", "-", "-", "", "1", ""],
       ["left", "", "right", "-", "-", "2", "", "3"],
       ["", "down", "", "-", "-", "", "4", ""],

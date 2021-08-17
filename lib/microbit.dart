@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_blue/flutter_blue.dart';
@@ -82,4 +83,80 @@ Future<void> uartSend(List<BluetoothService> services, String text) async {
       return;
     }
   }
+}
+
+Future<int> getButtonState(
+    List<BluetoothService> services, String button) async {
+  for (var service in services) {
+    var characteristics = service.characteristics;
+    for (BluetoothCharacteristic c in characteristics) {
+      var serviceUuid = c.serviceUuid.toString().toUpperCase();
+      var uuid = c.uuid.toString().toUpperCase();
+      if (BTN_SRV != serviceUuid || button != uuid) {
+        continue;
+      }
+
+      List<int> val = await c.read();
+      return val[0];
+    }
+  }
+  return 0;
+}
+
+Future<void> setButtonState(
+    List<BluetoothService> services, String button, int value) async {
+  for (var service in services) {
+    var characteristics = service.characteristics;
+    for (BluetoothCharacteristic c in characteristics) {
+      var serviceUuid = c.serviceUuid.toString().toUpperCase();
+      var uuid = c.uuid.toString().toUpperCase();
+      if (BTN_SRV != serviceUuid || button != uuid) {
+        continue;
+      }
+
+      await c.write([value]);
+      return;
+    }
+  }
+}
+
+Future<int> getButtonA(List<BluetoothService> services) async {
+  return getButtonState(services, BTN_A_STATE);
+}
+
+Future<int> getButtonB(List<BluetoothService> services) async {
+  return getButtonState(services, BTN_B_STATE);
+}
+
+Future<void> clickButtonA(List<BluetoothService> services) async {
+  setButtonState(services, BTN_A_STATE, 1);
+  Timer(Duration(milliseconds: 500),
+      () => {setButtonState(services, BTN_A_STATE, 0)});
+}
+
+Future<void> clickButtonB(List<BluetoothService> services) async {
+  setButtonState(services, BTN_B_STATE, 1);
+  Timer(Duration(milliseconds: 500),
+      () => {setButtonState(services, BTN_B_STATE, 1)});
+}
+
+Future<int> getTemperature(List<BluetoothService> services) async {
+  for (var service in services) {
+    var characteristics = service.characteristics;
+    for (BluetoothCharacteristic c in characteristics) {
+      var serviceUuid = c.serviceUuid.toString().toUpperCase();
+      var uuid = c.uuid.toString().toUpperCase();
+      if (TEMP_SRV != serviceUuid || TEMP_DATA != uuid) {
+        continue;
+      }
+
+      List<int> val = await c.read();
+      int temp = 0;
+      for (var v in val) {
+        temp = (temp << 8) | v;
+      }
+      return temp;
+    }
+  }
+  return 0;
 }

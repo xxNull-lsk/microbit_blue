@@ -1,21 +1,24 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:orientation/orientation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import 'gamepad.dart';
 import 'microbit.dart';
 
-class GamepadPage extends StatefulWidget {
-  GamepadPage({Key? key, required this.device}) : super(key: key);
+class PanelPage extends StatefulWidget {
+  PanelPage({Key? key, required this.device}) : super(key: key);
 
   final BluetoothDevice device;
 
   @override
-  _GamepadPageState createState() => _GamepadPageState();
+  _PanelPageState createState() => _PanelPageState();
 }
 
-class _GamepadPageState extends State<GamepadPage> {
+class _PanelPageState extends State<PanelPage> {
   void initState() {
     super.initState();
     //隐藏状态栏和导航栏
@@ -27,6 +30,42 @@ class _GamepadPageState extends State<GamepadPage> {
     //隐藏状态栏
     SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
     OrientationPlugin.forceOrientation(DeviceOrientation.landscapeRight);
+    Timer.periodic(Duration(seconds: 1), onTimer);
+  }
+
+  var buttonsColor = {
+    "logo": Colors.grey,
+    "A": Colors.grey,
+    "B": Colors.grey,
+    "T": Colors.grey,
+  };
+
+  var labelValues = {
+    "logo": "",
+    "A": "",
+    "B": "",
+    "T": "",
+  };
+
+  Future<void> onTimer(var timer) async {
+    var services = await widget.device.discoverServices();
+    int state = await getButtonA(services);
+    if (state != 0) {
+      labelValues["A"] = "已按下";
+      buttonsColor["A"] = Colors.green;
+    } else {
+      labelValues["A"] = "";
+      buttonsColor["A"] = Colors.grey;
+    }
+
+    state = await getButtonB(services);
+    if (state != 0) {
+      labelValues["B"] = "已按下";
+      buttonsColor["B"] = Colors.green;
+    } else {
+      labelValues["B"] = "";
+      buttonsColor["B"] = Colors.grey;
+    }
   }
 
   void deactivate() {
@@ -40,10 +79,19 @@ class _GamepadPageState extends State<GamepadPage> {
     var services = await widget.device.discoverServices();
     Fluttertoast.showToast(msg: txt);
 
-    await uartSend(services, txt);
+    switch (txt) {
+      case 'A':
+        await clickButtonA(services);
+        break;
+      case 'B':
+        await clickButtonB(services);
+        break;
+      default:
+        Fluttertoast.showToast(msg: "未知按钮： $txt");
+    }
   }
 
-  void switchToPanel() {
+  void switchToGamepad() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) {
@@ -59,12 +107,12 @@ class _GamepadPageState extends State<GamepadPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("游戏手柄"),
+        title: Text("面板"),
         actions: [
           IconButton(
             disabledColor: Colors.grey,
-            onPressed: switchToPanel,
-            icon: Icon(Icons.paid),
+            onPressed: switchToGamepad,
+            icon: Icon(Icons.gamepad),
           ),
           IconButton(
             disabledColor: Colors.grey,
@@ -87,36 +135,25 @@ class _GamepadPageState extends State<GamepadPage> {
 
   List<Widget> _renderRowItem(List<String> _items) {
     var btnIcons = {
-      "up": Icons.arrow_upward,
-      "down": Icons.arrow_downward,
-      "left": Icons.arrow_back,
-      "right": Icons.arrow_forward,
-      "1": Icons.looks_one,
-      "2": Icons.looks_two,
-      "3": Icons.looks_3,
-      "4": Icons.looks_4,
-      "start": Icons.play_arrow,
-      "stop": Icons.stop,
-    };
-    var btnColors = {
-      "1": Colors.deepOrange,
-      "2": Colors.deepOrange,
-      "3": Colors.deepPurple,
-      "4": Colors.deepPurple,
-      "start": Colors.green,
-      "stop": Colors.red,
+      "logo": Icons.radio,
+      "A": Icons.ac_unit,
+      "B": Icons.backpack,
+      "T": Icons.tab,
     };
     List<Widget> items = [];
+    String name = _items.elementAt(0);
     for (var item in _items) {
-      if (item == "") {
-        items.add(Text(""));
+      if (item == "LABEL") {
+        String? val = labelValues[name];
+        val ??= "";
+        items.add(Text(val));
       } else if (item == "-") {
         items.add(Text(""));
       } else {
         items.add(IconButton(
           onPressed: () => _onPressed(item),
           icon: Icon(btnIcons[item]),
-          color: btnColors[item],
+          color: buttonsColor[name],
           iconSize: 48,
         ));
       }
@@ -127,11 +164,10 @@ class _GamepadPageState extends State<GamepadPage> {
   List<TableRow> _renderArrow() {
     List<TableRow> items = [];
     var rowItems = [
-      ["", "", "", "-", "-", "", "", ""],
-      ["", "up", "", "-", "-", "", "1", ""],
-      ["left", "", "right", "-", "-", "2", "", "3"],
-      ["", "down", "", "-", "-", "", "4", ""],
-      ["", "", "", "start", "stop", "", "", ""],
+      ["logo", "LABEL"],
+      ["A", "LABEL"],
+      ["B", "LABEL"],
+      ["T", "LABEL"],
     ];
     for (var row in rowItems) {
       items.add(TableRow(children: _renderRowItem(row)));

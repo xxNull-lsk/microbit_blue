@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter_blue/flutter_blue.dart';
 
@@ -85,22 +86,56 @@ Future<void> uartSend(List<BluetoothService> services, String text) async {
   }
 }
 
-Future<int> getButtonState(
-    List<BluetoothService> services, String button) async {
+Future<bool> listenValue(List<BluetoothService> services, String _serviceUuid,
+    String _uuid, void onChanged(List<int> value)) async {
   for (var service in services) {
     var characteristics = service.characteristics;
     for (BluetoothCharacteristic c in characteristics) {
       var serviceUuid = c.serviceUuid.toString().toUpperCase();
       var uuid = c.uuid.toString().toUpperCase();
-      if (BTN_SRV != serviceUuid || button != uuid) {
+      if (_serviceUuid != serviceUuid || _uuid != uuid) {
         continue;
       }
-
-      List<int> val = await c.read();
-      return val[0];
+      try {
+        bool ret = await c.setNotifyValue(true);
+        if (!ret) {
+          print("listenValue: setNotifyValue $_serviceUuid $_uuid failed!");
+          return ret;
+        }
+        c.value.listen((value) {
+          onChanged(value);
+        });
+        return true;
+      } catch (e) {
+        print("listenValue exception: $e");
+        return false;
+      }
     }
   }
-  return 0;
+  print(
+      "listenValue failed! not found!_serviceUuid=$_serviceUuid _uuid=$_uuid");
+  return false;
+}
+
+Future<List<int>> getValue(
+    List<BluetoothService> services, String _serviceUuid, String _uuid) async {
+  for (var service in services) {
+    var characteristics = service.characteristics;
+    for (BluetoothCharacteristic c in characteristics) {
+      var serviceUuid = c.serviceUuid.toString().toUpperCase();
+      var uuid = c.uuid.toString().toUpperCase();
+      if (_serviceUuid != serviceUuid || _uuid != uuid) {
+        continue;
+      }
+      try {
+        return c.read();
+      } catch (e) {
+        print("getTemperature: $e");
+        return [];
+      }
+    }
+  }
+  return [];
 }
 
 Future<void> setButtonState(
@@ -120,43 +155,36 @@ Future<void> setButtonState(
   }
 }
 
-Future<int> getButtonA(List<BluetoothService> services) async {
-  return getButtonState(services, BTN_A_STATE);
+Future<bool> listenButtonA(
+    List<BluetoothService> services, void onChanged(int val)) {
+  return listenValue(services, BTN_SRV, BTN_A_STATE, (val) {
+    onChanged(val[0]);
+  });
 }
 
-Future<int> getButtonB(List<BluetoothService> services) async {
-  return getButtonState(services, BTN_B_STATE);
+Future<bool> listenButtonB(
+    List<BluetoothService> services, void onChanged(int val)) {
+  return listenValue(services, BTN_SRV, BTN_B_STATE, (val) {
+    onChanged(val[0]);
+  });
 }
 
-Future<void> clickButtonA(List<BluetoothService> services) async {
-  setButtonState(services, BTN_A_STATE, 1);
-  Timer(Duration(milliseconds: 500),
-      () => {setButtonState(services, BTN_A_STATE, 0)});
-}
-
-Future<void> clickButtonB(List<BluetoothService> services) async {
-  setButtonState(services, BTN_B_STATE, 1);
-  Timer(Duration(milliseconds: 500),
-      () => {setButtonState(services, BTN_B_STATE, 1)});
+Future<bool> listenTemperature(
+    List<BluetoothService> services, void onChanged(int val)) {
+  return listenValue(services, TEMP_SRV, TEMP_DATA, (val) {
+    int temp = 0;
+    for (var v in val) {
+      temp = (temp << 8) | v;
+    }
+    onChanged(temp);
+  });
 }
 
 Future<int> getTemperature(List<BluetoothService> services) async {
-  for (var service in services) {
-    var characteristics = service.characteristics;
-    for (BluetoothCharacteristic c in characteristics) {
-      var serviceUuid = c.serviceUuid.toString().toUpperCase();
-      var uuid = c.uuid.toString().toUpperCase();
-      if (TEMP_SRV != serviceUuid || TEMP_DATA != uuid) {
-        continue;
-      }
-
-      List<int> val = await c.read();
-      int temp = 0;
-      for (var v in val) {
-        temp = (temp << 8) | v;
-      }
-      return temp;
-    }
+  List<int> val = await getValue(services, TEMP_SRV, TEMP_DATA);
+  int temp = 0;
+  for (var v in val) {
+    temp = (temp << 8) | v;
   }
-  return 0;
+  return temp;
 }

@@ -18,77 +18,66 @@ class PanelPage extends StatefulWidget {
   _PanelPageState createState() => _PanelPageState();
 }
 
+class ListItem {
+  ListItem(
+    this.icon,
+    this.label,
+    this.color,
+  );
+  IconData icon;
+  final String label;
+  Color color;
+  String value = "";
+}
+
 class _PanelPageState extends State<PanelPage> {
+  late var services;
+
+  List<String> itemNames = ['A', 'B', 'T'];
+
+  var items = {
+    "A": ListItem(Icons.radio_button_off, "按钮A", Colors.grey),
+    "B": ListItem(Icons.radio_button_off, "按钮B", Colors.grey),
+    "T": ListItem(Icons.water, "温度", Colors.grey),
+  };
+
   void initState() {
     super.initState();
-    //隐藏状态栏和导航栏
-    SystemChrome.setEnabledSystemUIOverlays([]);
-
-    //隐藏底部导航栏
-    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
-
-    //隐藏状态栏
-    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
-    OrientationPlugin.forceOrientation(DeviceOrientation.landscapeRight);
-    Timer.periodic(Duration(seconds: 1), onTimer);
-  }
-
-  var buttonsColor = {
-    "logo": Colors.grey,
-    "A": Colors.grey,
-    "B": Colors.grey,
-    "T": Colors.grey,
-  };
-
-  var labelValues = {
-    "logo": "",
-    "A": "",
-    "B": "",
-    "T": "",
-  };
-
-  Future<void> onTimer(var timer) async {
-    var services = await widget.device.discoverServices();
-    int state = await getButtonA(services);
-    if (state != 0) {
-      labelValues["A"] = "已按下";
-      buttonsColor["A"] = Colors.green;
-    } else {
-      labelValues["A"] = "";
-      buttonsColor["A"] = Colors.grey;
-    }
-
-    state = await getButtonB(services);
-    if (state != 0) {
-      labelValues["B"] = "已按下";
-      buttonsColor["B"] = Colors.green;
-    } else {
-      labelValues["B"] = "";
-      buttonsColor["B"] = Colors.grey;
-    }
+    OrientationPlugin.forceOrientation(DeviceOrientation.portraitUp);
+    widget.device.state.listen((event) {
+      if (event == BluetoothDeviceState.disconnected) {
+        Fluttertoast.showToast(msg: "${widget.device.name} 失去连接");
+        Navigator.pop(context);
+      }
+    });
+    widget.device.discoverServices().then((value) async {
+      services = value;
+      List<List<dynamic>> buttonState = [
+        ["", Colors.grey, Icons.radio_button_off],
+        ["已按下", Colors.green, Icons.radio_button_on],
+        ["长按", Colors.red, Icons.radio_button_on_outlined],
+      ];
+      await listenButtonA(services, (state) {
+        items["A"]!.value = buttonState[state][0];
+        items["A"]!.color = buttonState[state][1];
+        items["A"]!.icon = buttonState[state][2];
+        setState(() {});
+      });
+      await listenButtonB(services, (state) {
+        items["B"]!.value = buttonState[state][0];
+        items["B"]!.color = buttonState[state][1];
+        items["B"]!.icon = buttonState[state][2];
+        setState(() {});
+      });
+      await listenTemperature(services, (value) {
+        items["T"]!.value = "$value ℃";
+        setState(() {});
+      });
+    });
   }
 
   void deactivate() {
     super.deactivate();
-    OrientationPlugin.forceOrientation(DeviceOrientation.portraitUp);
-    //恢复默认
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-  }
-
-  Future<void> _onPressed(String txt) async {
-    var services = await widget.device.discoverServices();
-    Fluttertoast.showToast(msg: txt);
-
-    switch (txt) {
-      case 'A':
-        await clickButtonA(services);
-        break;
-      case 'B':
-        await clickButtonB(services);
-        break;
-      default:
-        Fluttertoast.showToast(msg: "未知按钮： $txt");
-    }
   }
 
   void switchToGamepad() {
@@ -122,56 +111,26 @@ class _PanelPageState extends State<PanelPage> {
         ],
       ),
       body: Center(
-        child: Column(
-          children: [
-            Table(
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                children: _renderArrow()),
-          ],
+        child: ListView.builder(
+          itemBuilder: itemBuilder,
+          itemCount: itemNames.length,
         ),
       ),
     );
   }
 
-  List<Widget> _renderRowItem(List<String> _items) {
-    var btnIcons = {
-      "logo": Icons.radio,
-      "A": Icons.ac_unit,
-      "B": Icons.backpack,
-      "T": Icons.tab,
-    };
-    List<Widget> items = [];
-    String name = _items.elementAt(0);
-    for (var item in _items) {
-      if (item == "LABEL") {
-        String? val = labelValues[name];
-        val ??= "";
-        items.add(Text(val));
-      } else if (item == "-") {
-        items.add(Text(""));
-      } else {
-        items.add(IconButton(
-          onPressed: () => _onPressed(item),
-          icon: Icon(btnIcons[item]),
-          color: buttonsColor[name],
-          iconSize: 48,
-        ));
-      }
+  Widget itemBuilder(BuildContext context, int index) {
+    if (index >= itemNames.length) {
+      return Text("没有更多数据了");
     }
-    return items;
-  }
-
-  List<TableRow> _renderArrow() {
-    List<TableRow> items = [];
-    var rowItems = [
-      ["logo", "LABEL"],
-      ["A", "LABEL"],
-      ["B", "LABEL"],
-      ["T", "LABEL"],
-    ];
-    for (var row in rowItems) {
-      items.add(TableRow(children: _renderRowItem(row)));
-    }
-    return items;
+    String name = itemNames[index];
+    String val = items[name]!.value;
+    return ListTile(
+      leading: Icon(
+        items[name]!.icon,
+        color: items[name]!.color,
+      ),
+      title: Text(val),
+    );
   }
 }

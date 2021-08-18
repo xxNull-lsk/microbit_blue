@@ -5,6 +5,7 @@ import 'package:orientation/orientation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'microbit.dart';
+import 'panel.dart';
 
 class GamepadPage extends StatefulWidget {
   GamepadPage({Key? key, required this.device}) : super(key: key);
@@ -18,6 +19,12 @@ class GamepadPage extends StatefulWidget {
 class _GamepadPageState extends State<GamepadPage> {
   void initState() {
     super.initState();
+    widget.device.state.listen((event) {
+      if (event == BluetoothDeviceState.disconnected) {
+        Fluttertoast.showToast(msg: "${widget.device.name} 失去连接");
+        Navigator.pop(context);
+      }
+    });
     //隐藏状态栏和导航栏
     SystemChrome.setEnabledSystemUIOverlays([]);
 
@@ -44,15 +51,25 @@ class _GamepadPageState extends State<GamepadPage> {
   }
 
   void switchToPanel() {
-    Navigator.of(context).pushReplacement(
+    Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) {
-          return GamepadPage(
+          return PanelPage(
             device: widget.device,
           );
         },
       ),
-    );
+    ).then((value) {
+      //隐藏状态栏和导航栏
+      SystemChrome.setEnabledSystemUIOverlays([]);
+
+      //隐藏底部导航栏
+      SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
+
+      //隐藏状态栏
+      SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
+      OrientationPlugin.forceOrientation(DeviceOrientation.landscapeRight);
+    });
   }
 
   @override

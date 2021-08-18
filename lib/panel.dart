@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:microbit_blue/myIcons.dart';
 import 'package:orientation/orientation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -38,7 +39,7 @@ class _PanelPageState extends State<PanelPage> {
   var items = {
     "A": ListItem(Icons.radio_button_off, "按钮A", Colors.grey),
     "B": ListItem(Icons.radio_button_off, "按钮B", Colors.grey),
-    "T": ListItem(Icons.water, "温度", Colors.grey),
+    "T": ListItem(MyIcons.temperature, "温度", Colors.grey),
   };
 
   void initState() {

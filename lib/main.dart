@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:microbit_blue/gamepad.dart';
-import 'microbit.dart';
+import 'package:microbit_blue/myIcons.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,11 +16,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mico:Bit',
+      title: 'Micro:Bit',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Mico:Bit'),
+      home: MyHomePage(title: 'Micro:Bit'),
     );
   }
 }
@@ -133,7 +132,8 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             disabledColor: Colors.grey,
             onPressed: isScanning ? null : _startScan,
-            icon: Icon(Icons.scanner),
+            icon:
+                Icon(MyIcons.bluetooth_searching, color: Colors.blue, size: 32),
           ),
           IconButton(
             disabledColor: Colors.grey,

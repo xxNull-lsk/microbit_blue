@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:microbit_blue/IconFont.dart';
 import 'package:microbit_blue/gamepad.dart';
-import 'package:microbit_blue/myIcons.dart';
 
 void main() {
   runApp(MyApp());
@@ -115,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () {
               _onPressed(microbitBlueNameAry[index]);
             },
-            icon: Icon(Icons.bluetooth),
+            icon: Icon(IconFont.icon_bluetooth_01),
             label: Text(microbitBlueNameAry[index])));
   }
 
@@ -132,13 +132,12 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             disabledColor: Colors.grey,
             onPressed: isScanning ? null : _startScan,
-            icon:
-                Icon(MyIcons.bluetooth_searching, color: Colors.blue, size: 32),
+            icon: Icon(IconFont.icon_bluetooth_01),
           ),
           IconButton(
             disabledColor: Colors.grey,
             onPressed: isScanning ? _stopScan : null,
-            icon: Icon(Icons.stop),
+            icon: Icon(IconFont.icon_stop),
           ),
         ],
       ),

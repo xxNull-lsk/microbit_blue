@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:microbit_blue/%20alphabet.dart';
+import 'package:microbit_blue/IconFont.dart';
+import 'package:microbit_blue/number.dart';
 import 'package:orientation/orientation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -25,15 +28,8 @@ class _GamepadPageState extends State<GamepadPage> {
         Navigator.pop(context);
       }
     });
-    //隐藏状态栏和导航栏
-    SystemChrome.setEnabledSystemUIOverlays([]);
 
-    //隐藏底部导航栏
-    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
-
-    //隐藏状态栏
-    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
-    OrientationPlugin.forceOrientation(DeviceOrientation.landscapeRight);
+    initLandScape();
   }
 
   void deactivate() {
@@ -50,6 +46,18 @@ class _GamepadPageState extends State<GamepadPage> {
     await uartSend(services, txt);
   }
 
+  void initLandScape() {
+    //隐藏状态栏和导航栏
+    SystemChrome.setEnabledSystemUIOverlays([]);
+
+    //隐藏底部导航栏
+    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
+
+    //隐藏状态栏
+    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
+    OrientationPlugin.forceOrientation(DeviceOrientation.landscapeRight);
+  }
+
   void switchToPanel() {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -60,15 +68,35 @@ class _GamepadPageState extends State<GamepadPage> {
         },
       ),
     ).then((value) {
-      //隐藏状态栏和导航栏
-      SystemChrome.setEnabledSystemUIOverlays([]);
+      initLandScape();
+    });
+  }
 
-      //隐藏底部导航栏
-      SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
+  void switchToNumberPanel() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return NumberPage(
+            device: widget.device,
+          );
+        },
+      ),
+    ).then((value) {
+      initLandScape();
+    });
+  }
 
-      //隐藏状态栏
-      SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
-      OrientationPlugin.forceOrientation(DeviceOrientation.landscapeRight);
+  void switchToAlphabetPanel() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return AlphabetPage(
+            device: widget.device,
+          );
+        },
+      ),
+    ).then((value) {
+      initLandScape();
     });
   }
 
@@ -81,12 +109,27 @@ class _GamepadPageState extends State<GamepadPage> {
           IconButton(
             disabledColor: Colors.grey,
             onPressed: switchToPanel,
-            icon: Icon(Icons.paid),
+            icon: Icon(IconFont.icon_mianban),
+          ),
+          IconButton(
+            disabledColor: Colors.grey,
+            onPressed: switchToNumberPanel,
+            icon: Icon(IconFont.icon_shuzi),
+          ),
+          IconButton(
+            disabledColor: Colors.grey,
+            onPressed: switchToAlphabetPanel,
+            icon: Icon(IconFont.icon_zimu),
           ),
           IconButton(
             disabledColor: Colors.grey,
             onPressed: null,
-            icon: Icon(Icons.settings),
+            icon: Icon(IconFont.icon_liaotian_04),
+          ),
+          IconButton(
+            disabledColor: Colors.grey,
+            onPressed: null,
+            icon: Icon(IconFont.icon_shezhi),
           ),
         ],
       ),
@@ -104,16 +147,16 @@ class _GamepadPageState extends State<GamepadPage> {
 
   List<Widget> _renderRowItem(List<String> _items) {
     var btnIcons = {
-      "up": Icons.arrow_upward,
-      "down": Icons.arrow_downward,
-      "left": Icons.arrow_back,
-      "right": Icons.arrow_forward,
-      "1": Icons.looks_one,
-      "2": Icons.looks_two,
-      "3": Icons.looks_3,
-      "4": Icons.looks_4,
-      "start": Icons.play_arrow,
-      "stop": Icons.stop,
+      "up": IconFont.icon_jiantou_shang_1,
+      "down": IconFont.icon_jiantou_xia_1,
+      "left": IconFont.icon_jiantou_zuo_1,
+      "right": IconFont.icon_jiantou_you_1,
+      "1": IconFont.icon_1_round_solid,
+      "2": IconFont.icon_2_round_solid,
+      "3": IconFont.icon_3_round_solid,
+      "4": IconFont.icon_4_round_solid,
+      "start": IconFont.icon_start,
+      "stop": IconFont.icon_stop,
     };
     var btnColors = {
       "1": Colors.deepOrange,

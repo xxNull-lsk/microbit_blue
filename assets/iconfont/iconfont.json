@@ -1,0 +1,464 @@
+{
+  "id": "2760572",
+  "name": "micro_bit_blue",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "6801412",
+      "name": "Rec-Button",
+      "font_class": "rec_button",
+      "unicode": "e621",
+      "unicode_decimal": 58913
+    },
+    {
+      "icon_id": "2127429",
+      "name": "面板",
+      "font_class": "mianban",
+      "unicode": "e6c2",
+      "unicode_decimal": 59074
+    },
+    {
+      "icon_id": "3845276",
+      "name": "红外遥控器-f",
+      "font_class": "yaokongqi",
+      "unicode": "e6ae",
+      "unicode_decimal": 59054
+    },
+    {
+      "icon_id": "3881867",
+      "name": "游戏,手柄",
+      "font_class": "youxi",
+      "unicode": "e763",
+      "unicode_decimal": 59235
+    },
+    {
+      "icon_id": "4348070",
+      "name": "键盘",
+      "font_class": "jianpan",
+      "unicode": "e620",
+      "unicode_decimal": 58912
+    },
+    {
+      "icon_id": "5766798",
+      "name": "箭头-上-粗线条2-fill",
+      "font_class": "jiantou-shang",
+      "unicode": "e6a7",
+      "unicode_decimal": 59047
+    },
+    {
+      "icon_id": "5766800",
+      "name": "箭头-上-粗线条-fill",
+      "font_class": "jiantou-shang-1",
+      "unicode": "e6a8",
+      "unicode_decimal": 59048
+    },
+    {
+      "icon_id": "5766805",
+      "name": "箭头-下-粗线条2-fill",
+      "font_class": "jiantou-xia",
+      "unicode": "e6aa",
+      "unicode_decimal": 59050
+    },
+    {
+      "icon_id": "5766806",
+      "name": "箭头-下-粗线条-fill",
+      "font_class": "jiantou-xia-1",
+      "unicode": "e6ab",
+      "unicode_decimal": 59051
+    },
+    {
+      "icon_id": "5766810",
+      "name": "箭头-右-粗线条-fill",
+      "font_class": "jiantou-you-1",
+      "unicode": "e6af",
+      "unicode_decimal": 59055
+    },
+    {
+      "icon_id": "5766811",
+      "name": "箭头-右-粗线条2-fill",
+      "font_class": "jiantou-you",
+      "unicode": "e6ad",
+      "unicode_decimal": 59053
+    },
+    {
+      "icon_id": "5766814",
+      "name": "箭头-左-粗线条-fill",
+      "font_class": "jiantou-zuo-1",
+      "unicode": "e6b1",
+      "unicode_decimal": 59057
+    },
+    {
+      "icon_id": "5766816",
+      "name": "箭头-左-粗线条2-fill",
+      "font_class": "jiantou-zuo",
+      "unicode": "e6b2",
+      "unicode_decimal": 59058
+    },
+    {
+      "icon_id": "6805915",
+      "name": "Rec-Button",
+      "font_class": "rec_button_fill",
+      "unicode": "ea34",
+      "unicode_decimal": 59956
+    },
+    {
+      "icon_id": "7123776",
+      "name": "温度计",
+      "font_class": "wenduji",
+      "unicode": "e616",
+      "unicode_decimal": 58902
+    },
+    {
+      "icon_id": "7821176",
+      "name": "刷新",
+      "font_class": "shuaxin",
+      "unicode": "e650",
+      "unicode_decimal": 58960
+    },
+    {
+      "icon_id": "14636674",
+      "name": "start",
+      "font_class": "start",
+      "unicode": "e670",
+      "unicode_decimal": 58992
+    },
+    {
+      "icon_id": "14844167",
+      "name": "魔法字母课",
+      "font_class": "zimu",
+      "unicode": "e629",
+      "unicode_decimal": 58921
+    },
+    {
+      "icon_id": "15464808",
+      "name": "A_round_solid_字母a",
+      "font_class": "A_round_solid",
+      "unicode": "e645",
+      "unicode_decimal": 58949
+    },
+    {
+      "icon_id": "15464809",
+      "name": "C_round_solid_字母c",
+      "font_class": "C_round_solid",
+      "unicode": "e646",
+      "unicode_decimal": 58950
+    },
+    {
+      "icon_id": "15464811",
+      "name": "B_round_solid_字母b",
+      "font_class": "B_round_solid",
+      "unicode": "e647",
+      "unicode_decimal": 58951
+    },
+    {
+      "icon_id": "15464812",
+      "name": "E_round_solid_字母e",
+      "font_class": "E_round_solid",
+      "unicode": "e648",
+      "unicode_decimal": 58952
+    },
+    {
+      "icon_id": "15464813",
+      "name": "D_round_solid_字母d",
+      "font_class": "D_round_solid",
+      "unicode": "e649",
+      "unicode_decimal": 58953
+    },
+    {
+      "icon_id": "15464814",
+      "name": "G_round_solid_字母g",
+      "font_class": "G_round_solid",
+      "unicode": "e64a",
+      "unicode_decimal": 58954
+    },
+    {
+      "icon_id": "15464815",
+      "name": "K_round_solid_字母k_by_climei",
+      "font_class": "K_round_solid",
+      "unicode": "e64b",
+      "unicode_decimal": 58955
+    },
+    {
+      "icon_id": "15464816",
+      "name": "F_round_solid_字母f_by_climei",
+      "font_class": "F_round_solid",
+      "unicode": "e64c",
+      "unicode_decimal": 58956
+    },
+    {
+      "icon_id": "15464817",
+      "name": "I_round_solid_字母i_by_climei",
+      "font_class": "I_round_solid",
+      "unicode": "e64d",
+      "unicode_decimal": 58957
+    },
+    {
+      "icon_id": "15464818",
+      "name": "H_round_solid_字母h_by_climei",
+      "font_class": "H_round_solid",
+      "unicode": "e64e",
+      "unicode_decimal": 58958
+    },
+    {
+      "icon_id": "15464819",
+      "name": "O_round_solid_字母o_by_climei",
+      "font_class": "O_round_solid",
+      "unicode": "e64f",
+      "unicode_decimal": 58959
+    },
+    {
+      "icon_id": "15464820",
+      "name": "J_round_solid_字母j_by_climei",
+      "font_class": "J_round_solid",
+      "unicode": "e651",
+      "unicode_decimal": 58961
+    },
+    {
+      "icon_id": "15464821",
+      "name": "L_round_solid_字母l_by_climei",
+      "font_class": "L_round_solid",
+      "unicode": "e652",
+      "unicode_decimal": 58962
+    },
+    {
+      "icon_id": "15464822",
+      "name": "M_round_solid_字母m_by_climei",
+      "font_class": "M_round_solid",
+      "unicode": "e653",
+      "unicode_decimal": 58963
+    },
+    {
+      "icon_id": "15464823",
+      "name": "Q_round_solid_字母q_by_climei",
+      "font_class": "Q_round_solid",
+      "unicode": "e654",
+      "unicode_decimal": 58964
+    },
+    {
+      "icon_id": "15464824",
+      "name": "P_round_solid_字母_by_climei",
+      "font_class": "P_round_solid",
+      "unicode": "e655",
+      "unicode_decimal": 58965
+    },
+    {
+      "icon_id": "15464825",
+      "name": "N_round_solid_字母n_by_climei",
+      "font_class": "N_round_solid",
+      "unicode": "e656",
+      "unicode_decimal": 58966
+    },
+    {
+      "icon_id": "15464826",
+      "name": "S_round_solid_字母s_by_climei",
+      "font_class": "S_round_solid",
+      "unicode": "e657",
+      "unicode_decimal": 58967
+    },
+    {
+      "icon_id": "15464827",
+      "name": "R_round_solid_字母r_by_climei",
+      "font_class": "R_round_solid",
+      "unicode": "e658",
+      "unicode_decimal": 58968
+    },
+    {
+      "icon_id": "15464828",
+      "name": "U_round_solid_字母u_by_climei",
+      "font_class": "U_round_solid",
+      "unicode": "e659",
+      "unicode_decimal": 58969
+    },
+    {
+      "icon_id": "15464829",
+      "name": "T_round_solid_字母t_by_climei",
+      "font_class": "T_round_solid",
+      "unicode": "e65a",
+      "unicode_decimal": 58970
+    },
+    {
+      "icon_id": "15464830",
+      "name": "V_round_solid_字母v_by_climei",
+      "font_class": "V_round_solid",
+      "unicode": "e65b",
+      "unicode_decimal": 58971
+    },
+    {
+      "icon_id": "15464831",
+      "name": "W_round_solid_字母w_by_climei",
+      "font_class": "W_round_solid",
+      "unicode": "e65c",
+      "unicode_decimal": 58972
+    },
+    {
+      "icon_id": "15464832",
+      "name": "Y_round_solid_字母y_by_climei",
+      "font_class": "Y_round_solid",
+      "unicode": "e65d",
+      "unicode_decimal": 58973
+    },
+    {
+      "icon_id": "15464833",
+      "name": "Z_round_solid_字母z_by_climei",
+      "font_class": "Z_round_solid",
+      "unicode": "e65e",
+      "unicode_decimal": 58974
+    },
+    {
+      "icon_id": "15464834",
+      "name": "X_round_solid_字母x_by_climei",
+      "font_class": "X_round_solid",
+      "unicode": "e65f",
+      "unicode_decimal": 58975
+    },
+    {
+      "icon_id": "15531888",
+      "name": "7_round_solid_数字7_by_climei",
+      "font_class": "7_round_solid",
+      "unicode": "e660",
+      "unicode_decimal": 58976
+    },
+    {
+      "icon_id": "15531890",
+      "name": "6_round_solid_数字6_by_climei",
+      "font_class": "6_round_solid",
+      "unicode": "e661",
+      "unicode_decimal": 58977
+    },
+    {
+      "icon_id": "15531891",
+      "name": "9_round_solid_数字9_by_climei",
+      "font_class": "9_round_solid",
+      "unicode": "e662",
+      "unicode_decimal": 58978
+    },
+    {
+      "icon_id": "15531892",
+      "name": "1_round_solid_数字1_by_climei",
+      "font_class": "1_round_solid",
+      "unicode": "e663",
+      "unicode_decimal": 58979
+    },
+    {
+      "icon_id": "15531894",
+      "name": "5_round_solid_数字5_by_climei",
+      "font_class": "5_round_solid",
+      "unicode": "e664",
+      "unicode_decimal": 58980
+    },
+    {
+      "icon_id": "15531898",
+      "name": "2_round_solid_数字2_by_climei",
+      "font_class": "2_round_solid",
+      "unicode": "e665",
+      "unicode_decimal": 58981
+    },
+    {
+      "icon_id": "15531900",
+      "name": "0_round_solid_数字0_by_climei",
+      "font_class": "0_round_solid",
+      "unicode": "e666",
+      "unicode_decimal": 58982
+    },
+    {
+      "icon_id": "15531901",
+      "name": "3_round_solid_数字3_by_climei",
+      "font_class": "3_round_solid",
+      "unicode": "e667",
+      "unicode_decimal": 58983
+    },
+    {
+      "icon_id": "15531902",
+      "name": "4_round_solid_数字4_by_climei",
+      "font_class": "4_round_solid",
+      "unicode": "e668",
+      "unicode_decimal": 58984
+    },
+    {
+      "icon_id": "15531903",
+      "name": "8_round_solid_数字8_by_climei",
+      "font_class": "8_round_solid",
+      "unicode": "e669",
+      "unicode_decimal": 58985
+    },
+    {
+      "icon_id": "15617444",
+      "name": "stop",
+      "font_class": "stop",
+      "unicode": "e8db",
+      "unicode_decimal": 59611
+    },
+    {
+      "icon_id": "17130695",
+      "name": "搜索",
+      "font_class": "sousuo",
+      "unicode": "e614",
+      "unicode_decimal": 58900
+    },
+    {
+      "icon_id": "18458589",
+      "name": "蓝牙",
+      "font_class": "bluetooth-01",
+      "unicode": "e737",
+      "unicode_decimal": 59191
+    },
+    {
+      "icon_id": "19685192",
+      "name": "发送",
+      "font_class": "sending",
+      "unicode": "eb5b",
+      "unicode_decimal": 60251
+    },
+    {
+      "icon_id": "20017632",
+      "name": "陀螺仪",
+      "font_class": "tuoluoyi",
+      "unicode": "e86f",
+      "unicode_decimal": 59503
+    },
+    {
+      "icon_id": "20140262",
+      "name": "聊天",
+      "font_class": "liaotian-04",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "21228539",
+      "name": "蓝牙",
+      "font_class": "lanya",
+      "unicode": "e724",
+      "unicode_decimal": 59172
+    },
+    {
+      "icon_id": "21703166",
+      "name": "设 置",
+      "font_class": "shezhi",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "23191095",
+      "name": "数字",
+      "font_class": "shuzi",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    },
+    {
+      "icon_id": "23419411",
+      "name": "陀螺仪指南针",
+      "font_class": "navigation",
+      "unicode": "e883",
+      "unicode_decimal": 59523
+    },
+    {
+      "icon_id": "705699",
+      "name": "指南针",
+      "font_class": "zhinanzhen",
+      "unicode": "e62f",
+      "unicode_decimal": 58927
+    }
+  ]
+}

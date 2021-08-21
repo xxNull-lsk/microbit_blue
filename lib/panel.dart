@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:microbit_blue/myIcons.dart';
+import 'package:microbit_blue/IconFont.dart';
 import 'package:orientation/orientation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -34,12 +34,13 @@ class ListItem {
 class _PanelPageState extends State<PanelPage> {
   late var services;
 
-  List<String> itemNames = ['A', 'B', 'T'];
+  List<String> itemNames = ['A', 'B', 'T', 'G'];
 
   var items = {
-    "A": ListItem(Icons.radio_button_off, "按钮A", Colors.grey),
-    "B": ListItem(Icons.radio_button_off, "按钮B", Colors.grey),
-    "T": ListItem(MyIcons.temperature, "温度", Colors.grey),
+    "A": ListItem(IconFont.icon_rec_button_fill, "按钮A", Colors.grey),
+    "B": ListItem(IconFont.icon_rec_button_fill, "按钮B", Colors.grey),
+    "T": ListItem(IconFont.icon_wenduji, "温度", Colors.grey),
+    "G": ListItem(IconFont.icon_navigation, "陀螺仪", Colors.grey),
   };
 
   void initState() {
@@ -54,9 +55,9 @@ class _PanelPageState extends State<PanelPage> {
     widget.device.discoverServices().then((value) async {
       services = value;
       List<List<dynamic>> buttonState = [
-        ["", Colors.grey, Icons.radio_button_off],
-        ["已按下", Colors.green, Icons.radio_button_on],
-        ["长按", Colors.red, Icons.radio_button_on_outlined],
+        ["", Colors.grey, IconFont.icon_rec_button_fill],
+        ["已按下", Colors.green, IconFont.icon_rec_button_fill],
+        ["长按", Colors.red, IconFont.icon_rec_button_fill],
       ];
       await listenButtonA(services, (state) {
         items["A"]!.value = buttonState[state][0];
@@ -72,6 +73,10 @@ class _PanelPageState extends State<PanelPage> {
       });
       await listenTemperature(services, (value) {
         items["T"]!.value = "$value ℃";
+        setState(() {});
+      });
+      await listenGyroscope(services, (x, y, z) {
+        items["G"]!.value = "$x, $y, $z";
         setState(() {});
       });
     });
@@ -97,13 +102,8 @@ class _PanelPageState extends State<PanelPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("面板"),
+        title: Text("信息面板"),
         actions: [
-          IconButton(
-            disabledColor: Colors.grey,
-            onPressed: switchToGamepad,
-            icon: Icon(Icons.gamepad),
-          ),
           IconButton(
             disabledColor: Colors.grey,
             onPressed: null,

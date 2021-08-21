@@ -188,3 +188,14 @@ Future<int> getTemperature(List<BluetoothService> services) async {
   }
   return temp;
 }
+
+Future<bool> listenGyroscope(List<BluetoothService> services,
+    void onChanged(double x, double y, double z)) {
+  return listenValue(services, ACCEL_SRV, ACCEL_DATA, (val) {
+    double x = 0, y = 0, z = 0;
+    x = (val[0] << 8 | val[1]) / 1000.0;
+    y = (val[2] << 8 | val[3]) / 1000.0;
+    z = (val[4] << 8 | val[5]) / 1000.0;
+    onChanged(x, y, z);
+  });
+}

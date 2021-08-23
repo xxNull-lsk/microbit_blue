@@ -20,27 +20,34 @@ class PanelPage extends StatefulWidget {
 }
 
 class ListItem {
-  ListItem(
-    this.icon,
-    this.label,
-    this.color,
-  );
+  ListItem(this.icon, this.label, this.color, {this.value = ""});
   IconData icon;
   final String label;
   Color color;
-  String value = "";
+  String value;
 }
 
 class _PanelPageState extends State<PanelPage> {
   late var services;
 
-  List<String> itemNames = ['A', 'B', 'T', 'G'];
-
   var items = {
     "A": ListItem(IconFont.icon_rec_button_fill, "按钮A", Colors.grey),
     "B": ListItem(IconFont.icon_rec_button_fill, "按钮B", Colors.grey),
-    "T": ListItem(IconFont.icon_wenduji, "温度", Colors.grey),
-    "G": ListItem(IconFont.icon_navigation, "陀螺仪", Colors.grey),
+    "Temperature": ListItem(IconFont.icon_wenduji, "温度", Colors.grey),
+    "Gyroscope": ListItem(IconFont.icon_navigation, "陀螺仪", Colors.grey),
+    "MicrobitEvent": ListItem(IconFont.icon_mianban, "Microbit事件", Colors.grey),
+    "MicrobitRequirements":
+        ListItem(IconFont.icon_mianban, "Microbit需求", Colors.grey),
+    "name": ListItem(IconFont.icon_rec_button_fill, "name", Colors.grey),
+    "modelNumber":
+        ListItem(IconFont.icon_rec_button_fill, "model", Colors.grey),
+    "serialNumber": ListItem(IconFont.icon_rec_button_fill, "SN", Colors.grey),
+    "firmwareRevision":
+        ListItem(IconFont.icon_rec_button_fill, "firmwareRev", Colors.grey),
+    "hardwareRevision":
+        ListItem(IconFont.icon_rec_button_fill, "hardwareRev", Colors.grey),
+    "manufacturer":
+        ListItem(IconFont.icon_rec_button_fill, "manufacturer", Colors.grey),
   };
 
   void initState() {
@@ -72,13 +79,36 @@ class _PanelPageState extends State<PanelPage> {
         setState(() {});
       });
       await listenTemperature(services, (value) {
-        items["T"]!.value = "$value ℃";
+        items["Temperature"]!.value = "$value ℃";
         setState(() {});
       });
       await listenGyroscope(services, (x, y, z) {
-        items["G"]!.value = "$x, $y, $z";
+        items["Gyroscope"]!.value = "$x, $y, $z";
         setState(() {});
       });
+      await listenMicrobitEvent(services, (a, b) {
+        items["MicrobitEvent"]!.value = "$a, $b";
+        setState(() {});
+      });
+      await listenMicrobitRequirements(services, (a, b) {
+        items["MicrobitRequirements"]!.value = "$a, $b";
+        setState(() {});
+      });
+      var di = await getDeviceInfomation(services);
+      items["firmwareRevision"]!.value = di.firmwareRevision;
+      items["hardwareRevision"]!.value = di.hardwareRevision;
+      items["manufacturer"]!.value = di.manufacturer;
+      items["modelNumber"]!.value = di.modelNumber;
+      items["serialNumber"]!.value = di.serialNumber;
+      items["name"]!.value = di.name;
+      for (var e in await getMicrobitRequirements(services)) {
+        items.putIfAbsent(
+            "event: ${e.type.toString()}",
+            () => ListItem(IconFont.icon_rec_button_fill,
+                "event_${e.type.toString()}", Colors.grey,
+                value: e.value.toString()));
+      }
+      setState(() {});
     });
   }
 
@@ -113,25 +143,27 @@ class _PanelPageState extends State<PanelPage> {
       ),
       body: Center(
         child: ListView.builder(
-          itemBuilder: itemBuilder,
-          itemCount: itemNames.length,
-        ),
+            itemBuilder: itemBuilder,
+            itemCount: items.length,
+            padding: EdgeInsets.all(0)),
       ),
     );
   }
 
   Widget itemBuilder(BuildContext context, int index) {
-    if (index >= itemNames.length) {
+    if (index >= items.length) {
       return Text("没有更多数据了");
     }
-    String name = itemNames[index];
-    String val = items[name]!.value;
+    String name = items.keys.elementAt(index);
     return ListTile(
+      minLeadingWidth: 24,
       leading: Icon(
         items[name]!.icon,
+        size: 32,
         color: items[name]!.color,
       ),
-      title: Text(val),
+      title: Text(items[name]!.label),
+      trailing: Text(items[name]!.value),
     );
   }
 }

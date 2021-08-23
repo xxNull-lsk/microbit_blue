@@ -7,6 +7,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:microbit_blue/IconFont.dart';
 import 'package:microbit_blue/gamepad.dart';
 
+import 'microbit.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -72,7 +74,8 @@ class _MyHomePageState extends State<MyHomePage> {
           continue;
         }
         var name = "${r.device.name} - ${r.device.id.toString()}";
-        if (microbitBlueNameAry.contains(name)) {
+        if (microbitBlueNameAry.contains(name) ||
+            !r.device.name.contains("micro:bit")) {
           continue;
         }
         Fluttertoast.showToast(msg: "发现$name");
@@ -90,6 +93,11 @@ class _MyHomePageState extends State<MyHomePage> {
       return;
     }
     result.device.connect().then((value) {
+      result.device.discoverServices().then((value) {
+        for (var x in value) {
+          dumpService(x);
+        }
+      });
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) {

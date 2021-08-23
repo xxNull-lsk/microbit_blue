@@ -1,9 +1,23 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ui';
+import 'dart:ffi';
 
 import 'package:flutter_blue/flutter_blue.dart';
 
+const String GENERIC_ACCESS_SRV = '00001800-0000-1000-8000-00805F9B34FB';
+const String GA_Device_Name = '00002A00-0000-1000-8000-00805F9B34FB';
+const String GA_Appearance = '00002A01-0000-1000-8000-00805F9B34FB';
+const String GA_Parameters = '00002A04-0000-1000-8000-00805F9B34FB';
+const String GENERIC_ATTRIBUTE_SRV = '00001801-0000-1000-8000-00805F9B34FB';
+const String DEVICE_INFO_SRV = '0000180A-0000-1000-8000-00805F9B34FB';
+const String DI_Model_Number_String = '00002A24-0000-1000-8000-00805F9B34FB';
+const String DI_Serial_Number_String = '00002A25-0000-1000-8000-00805F9B34FB';
+const String DI_Hardware_Revision_String =
+    '00002A27-0000-1000-8000-00805F9B34FB';
+const String DI_Firmware_Revision_String =
+    '00002A26-0000-1000-8000-00805F9B34FB';
+const String DI_Manufacturer_Name_String =
+    '00002A29-0000-1000-8000-00805F9B34FB';
 const String ACCEL_SRV = 'E95D0753-251D-470A-A062-FA1922DFA9A8';
 const String ACCEL_DATA = 'E95DCA4B-251D-470A-A062-FA1922DFA9A8';
 const String ACCEL_PERIOD = 'E95DFB24-251D-470A-A062-FA1922DFA9A8';
@@ -30,14 +44,74 @@ const String TEMP_PERIOD = 'E95D1B25-251D-470A-A062-FA1922DFA9A8';
 const String UART_SRV = '6E400001-B5A3-F393-E0A9-E50E24DCCA9E';
 const String UART_TX = '6E400002-B5A3-F393-E0A9-E50E24DCCA9E';
 const String UART_RX = '6E400003-B5A3-F393-E0A9-E50E24DCCA9E';
+// https://lancaster-university.github.io/microbit-docs/ble/event-service/
+const String EVENT_SRV = 'E95D93AF-251D-470A-A062-FA1922DFA9A8';
+const String EVENT_MICROBIT_REQUIREMENTS =
+    "E95DB84C-251D-470A-A062-FA1922DFA9A8";
+const String EVENT_MICROBITEVENT = "E95D9775-251D-470A-A062-FA1922DFA9A8";
+const String EVENT_CLIENTREQUIREMENTS = "E95D23C4-251D-470A-A062-FA1922DFA9A8";
+const String EVENT_CLIENTEVENT = "E95D5404-251D-470A-A062-FA1922DFA9A8";
+
+const String PARTIAL_FLASH_SRV = 'E97DD91D-251D-470A-A062-FA1922DFA9A8';
+
+class DeviceInformation {
+  String name = '';
+  String modelNumber = '';
+  String serialNumber = '';
+  String firmwareRevision = '';
+  String hardwareRevision = '';
+  String manufacturer = '';
+}
+
+Future<DeviceInformation> getDeviceInfomation(
+    List<BluetoothService> services) async {
+  DeviceInformation di = DeviceInformation();
+  for (var service in services) {
+    var serviceUuid = service.uuid.toString().toUpperCase();
+    if (serviceUuid != DEVICE_INFO_SRV && serviceUuid != GENERIC_ACCESS_SRV) {
+      continue;
+    }
+    var characteristics = service.characteristics;
+    for (BluetoothCharacteristic c in characteristics) {
+      var uuid = c.uuid.toString().toUpperCase();
+      if (DEVICE_INFO_SRV == serviceUuid) {
+        switch (uuid) {
+          case DI_Firmware_Revision_String:
+            di.firmwareRevision = utf8.decode(await c.read());
+            break;
+          case DI_Hardware_Revision_String:
+            di.hardwareRevision = utf8.decode(await c.read());
+            break;
+          case DI_Manufacturer_Name_String:
+            di.manufacturer = utf8.decode(await c.read());
+            break;
+          case DI_Model_Number_String:
+            di.modelNumber = utf8.decode(await c.read());
+            break;
+          case DI_Serial_Number_String:
+            di.serialNumber = utf8.decode(await c.read());
+            break;
+        }
+      } else if (GENERIC_ACCESS_SRV == serviceUuid) {
+        if (uuid == GA_Device_Name) {
+          di.name = utf8.decode(await c.read());
+        }
+      }
+    }
+  }
+  return di;
+}
 
 Future<void> ledText(List<BluetoothService> services, String text) async {
   for (var service in services) {
+    var serviceUuid = service.uuid.toString().toUpperCase();
+    if (serviceUuid != LED_SRV) {
+      continue;
+    }
     var characteristics = service.characteristics;
     for (BluetoothCharacteristic c in characteristics) {
-      var serviceUuid = c.serviceUuid.toString().toUpperCase();
       var uuid = c.uuid.toString().toUpperCase();
-      if (LED_SRV != serviceUuid || LED_TEXT != uuid) {
+      if (LED_TEXT != uuid) {
         continue;
       }
 
@@ -56,11 +130,14 @@ const List<int> LED_RIGHT = [0, 1, 2, 20, 8];
 const List<int> LED_ERROR = [17, 10, 4, 10, 17];
 Future<void> ledPixels(List<BluetoothService> services, List<int> data) async {
   for (var service in services) {
+    var serviceUuid = service.uuid.toString().toUpperCase();
+    if (serviceUuid != LED_SRV) {
+      continue;
+    }
     var characteristics = service.characteristics;
     for (BluetoothCharacteristic c in characteristics) {
-      var serviceUuid = c.serviceUuid.toString().toUpperCase();
       var uuid = c.uuid.toString().toUpperCase();
-      if (LED_SRV != serviceUuid || LED_STATE != uuid) {
+      if (LED_STATE != uuid) {
         continue;
       }
 
@@ -72,11 +149,14 @@ Future<void> ledPixels(List<BluetoothService> services, List<int> data) async {
 
 Future<void> uartSend(List<BluetoothService> services, String text) async {
   for (var service in services) {
+    var serviceUuid = service.uuid.toString().toUpperCase();
+    if (serviceUuid != UART_SRV) {
+      continue;
+    }
     var characteristics = service.characteristics;
     for (BluetoothCharacteristic c in characteristics) {
-      var serviceUuid = c.serviceUuid.toString().toUpperCase();
       var uuid = c.uuid.toString().toUpperCase();
-      if (UART_SRV != serviceUuid || UART_RX != uuid) {
+      if (UART_RX != uuid) {
         continue;
       }
 
@@ -89,11 +169,14 @@ Future<void> uartSend(List<BluetoothService> services, String text) async {
 Future<bool> listenValue(List<BluetoothService> services, String _serviceUuid,
     String _uuid, void onChanged(List<int> value)) async {
   for (var service in services) {
+    var serviceUuid = service.uuid.toString().toUpperCase();
+    if (serviceUuid != _serviceUuid) {
+      continue;
+    }
     var characteristics = service.characteristics;
     for (BluetoothCharacteristic c in characteristics) {
-      var serviceUuid = c.serviceUuid.toString().toUpperCase();
       var uuid = c.uuid.toString().toUpperCase();
-      if (_serviceUuid != serviceUuid || _uuid != uuid) {
+      if (_uuid != uuid) {
         continue;
       }
       try {
@@ -120,11 +203,14 @@ Future<bool> listenValue(List<BluetoothService> services, String _serviceUuid,
 Future<List<int>> getValue(
     List<BluetoothService> services, String _serviceUuid, String _uuid) async {
   for (var service in services) {
+    var serviceUuid = service.uuid.toString().toUpperCase();
+    if (serviceUuid != _serviceUuid) {
+      continue;
+    }
     var characteristics = service.characteristics;
     for (BluetoothCharacteristic c in characteristics) {
-      var serviceUuid = c.serviceUuid.toString().toUpperCase();
       var uuid = c.uuid.toString().toUpperCase();
-      if (_serviceUuid != serviceUuid || _uuid != uuid) {
+      if (_uuid != uuid) {
         continue;
       }
       try {
@@ -141,11 +227,14 @@ Future<List<int>> getValue(
 Future<void> setButtonState(
     List<BluetoothService> services, String button, int value) async {
   for (var service in services) {
+    var serviceUuid = service.uuid.toString().toUpperCase();
+    if (serviceUuid != BTN_SRV) {
+      continue;
+    }
     var characteristics = service.characteristics;
     for (BluetoothCharacteristic c in characteristics) {
-      var serviceUuid = c.serviceUuid.toString().toUpperCase();
       var uuid = c.uuid.toString().toUpperCase();
-      if (BTN_SRV != serviceUuid || button != uuid) {
+      if (button != uuid) {
         continue;
       }
 
@@ -198,4 +287,59 @@ Future<bool> listenGyroscope(List<BluetoothService> services,
     z = (val[4] << 8 | val[5]) / 1000.0;
     onChanged(x, y, z);
   });
+}
+
+Future<bool> listenMicrobitRequirements(List<BluetoothService> services,
+    void onChanged(int eventType, int eventValue)) {
+  return listenValue(services, EVENT_SRV, EVENT_MICROBIT_REQUIREMENTS, (val) {
+    for (int i = 0; i < val.length / 4; i++) {
+      int index = i * 4;
+      int eventType = 0, eventValue = 0;
+      eventType = val[index] << 8 | val[index + 1];
+      eventValue = val[index + 2] << 8 | val[index + 3];
+      onChanged(eventType, eventValue);
+    }
+  });
+}
+
+class MicrobitEvent {
+  int type = 0;
+  int value = 0;
+}
+
+Future<List<MicrobitEvent>> getMicrobitRequirements(
+    List<BluetoothService> services) async {
+  List val = await getValue(services, EVENT_SRV, EVENT_MICROBIT_REQUIREMENTS);
+  List<MicrobitEvent> events = [];
+  for (int i = 0; i < val.length / 4; i++) {
+    int index = i * 4;
+    var ev = MicrobitEvent();
+    ev.type = val[index] << 8 | val[index + 1];
+    ev.value = val[index + 2] << 8 | val[index + 3];
+    events.add(ev);
+  }
+  return events;
+}
+
+Future<bool> listenMicrobitEvent(List<BluetoothService> services,
+    void onChanged(int eventType, int eventValue)) {
+  return listenValue(services, EVENT_SRV, EVENT_MICROBITEVENT, (val) {
+    for (int i = 0; i < val.length / 4; i++) {
+      int index = i * 4;
+      int eventType = 0, eventValue = 0;
+      eventType = val[index] << 8 | val[index + 1];
+      eventValue = val[index + 2] << 8 | val[index + 3];
+      onChanged(eventType, eventValue);
+    }
+  });
+}
+
+void dumpService(BluetoothService service) {
+  print("================= ${service.uuid}\n");
+  if (service.uuid.toString().toUpperCase() == '$EVENT_SRV') {
+    for (var item in service.characteristics) {
+      print(
+          "    characteristics uuid: ${item.uuid} ${item.properties.toString()}\n");
+    }
+  }
 }

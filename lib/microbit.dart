@@ -102,7 +102,8 @@ Future<DeviceInformation> getDeviceInfomation(
   return di;
 }
 
-Future<void> ledText(List<BluetoothService> services, String text) async {
+Future<void> _write(List<BluetoothService> services, String serviceUuid,
+    String characteristicsUuid, List<int> data) async {
   for (var service in services) {
     var serviceUuid = service.uuid.toString().toUpperCase();
     if (serviceUuid != LED_SRV) {
@@ -115,52 +116,7 @@ Future<void> ledText(List<BluetoothService> services, String text) async {
         continue;
       }
 
-      await c.write(utf8.encode(text));
-      return;
-    }
-  }
-}
-
-const List<int> LED_CLAER = [0x00, 0x00, 0x00, 0x00, 0x00];
-const List<int> LED_ARROW_LEFT = [0, 8, 31, 8, 0];
-const List<int> LED_ARROW_RIGHT = [0, 2, 31, 2, 0];
-const List<int> LED_HEART = [10, 255, 255, 14, 4];
-const List<int> LED_LITTLE_HEART = [0, 10, 14, 4, 0];
-const List<int> LED_RIGHT = [0, 1, 2, 20, 8];
-const List<int> LED_ERROR = [17, 10, 4, 10, 17];
-Future<void> ledPixels(List<BluetoothService> services, List<int> data) async {
-  for (var service in services) {
-    var serviceUuid = service.uuid.toString().toUpperCase();
-    if (serviceUuid != LED_SRV) {
-      continue;
-    }
-    var characteristics = service.characteristics;
-    for (BluetoothCharacteristic c in characteristics) {
-      var uuid = c.uuid.toString().toUpperCase();
-      if (LED_STATE != uuid) {
-        continue;
-      }
-
       await c.write(data);
-      return;
-    }
-  }
-}
-
-Future<void> uartSend(List<BluetoothService> services, String text) async {
-  for (var service in services) {
-    var serviceUuid = service.uuid.toString().toUpperCase();
-    if (serviceUuid != UART_SRV) {
-      continue;
-    }
-    var characteristics = service.characteristics;
-    for (BluetoothCharacteristic c in characteristics) {
-      var uuid = c.uuid.toString().toUpperCase();
-      if (UART_RX != uuid) {
-        continue;
-      }
-
-      await c.write(utf8.encode(text + "\n"));
       return;
     }
   }
@@ -224,24 +180,36 @@ Future<List<int>> getValue(
   return [];
 }
 
-Future<void> setButtonState(
-    List<BluetoothService> services, String button, int value) async {
-  for (var service in services) {
-    var serviceUuid = service.uuid.toString().toUpperCase();
-    if (serviceUuid != BTN_SRV) {
-      continue;
-    }
-    var characteristics = service.characteristics;
-    for (BluetoothCharacteristic c in characteristics) {
-      var uuid = c.uuid.toString().toUpperCase();
-      if (button != uuid) {
-        continue;
-      }
+void ledText(List<BluetoothService> services, String text) {
+  _write(services, LED_SRV, LED_TEXT, utf8.encode(text));
+}
 
-      await c.write([value]);
-      return;
-    }
-  }
+const List<int> LED_CLAER = [0, 0, 0, 0, 0];
+const List<int> LED_ARROW_LEFT = [0, 8, 31, 8, 0];
+const List<int> LED_ARROW_RIGHT = [0, 2, 31, 2, 0];
+const List<int> LED_HEART = [10, 255, 255, 14, 4];
+const List<int> LED_LITTLE_HEART = [0, 10, 14, 4, 0];
+const List<int> LED_RIGHT = [0, 1, 2, 20, 8];
+const List<int> LED_ERROR = [17, 10, 4, 10, 17];
+const List<int> LED_HAPPY = [0, 10, 0, 17, 14];
+const List<int> LED_UNHAPPY = [0, 10, 0, 14, 17];
+const List<int> LED_LOSS = [0, 10, 0, 10, 21];
+const List<int> LED_ANGRY = [17, 10, 0, 31, 21];
+const List<int> LED_SLEEP = [0, 27, 0, 14, 0];
+const List<int> LED_SURPRISE = [14, 0, 4, 10, 4];
+void ledPixels(List<BluetoothService> services, List<int> data) {
+  _write(services, LED_SRV, LED_STATE, data);
+}
+
+void uartSend(List<BluetoothService> services, String text) {
+  _write(services, UART_SRV, UART_RX, utf8.encode(text + "\n"));
+}
+
+Future<bool> listenUart(
+    List<BluetoothService> services, void onRecv(String val)) {
+  return listenValue(services, BTN_SRV, UART_TX, (val) {
+    onRecv(utf8.decode(val));
+  });
 }
 
 Future<bool> listenButtonA(
@@ -289,22 +257,22 @@ Future<bool> listenGyroscope(List<BluetoothService> services,
   });
 }
 
+class MicrobitEvent {
+  int type = 0;
+  int value = 0;
+}
+
 Future<bool> listenMicrobitRequirements(List<BluetoothService> services,
     void onChanged(int eventType, int eventValue)) {
   return listenValue(services, EVENT_SRV, EVENT_MICROBIT_REQUIREMENTS, (val) {
     for (int i = 0; i < val.length / 4; i++) {
       int index = i * 4;
-      int eventType = 0, eventValue = 0;
-      eventType = val[index] << 8 | val[index + 1];
-      eventValue = val[index + 2] << 8 | val[index + 3];
-      onChanged(eventType, eventValue);
+      var ev = MicrobitEvent();
+      ev.type = val[index] << 8 | val[index + 1];
+      ev.value = val[index + 2] << 8 | val[index + 3];
+      onChanged(ev.type, ev.value);
     }
   });
-}
-
-class MicrobitEvent {
-  int type = 0;
-  int value = 0;
 }
 
 Future<List<MicrobitEvent>> getMicrobitRequirements(
@@ -326,12 +294,38 @@ Future<bool> listenMicrobitEvent(List<BluetoothService> services,
   return listenValue(services, EVENT_SRV, EVENT_MICROBITEVENT, (val) {
     for (int i = 0; i < val.length / 4; i++) {
       int index = i * 4;
-      int eventType = 0, eventValue = 0;
-      eventType = val[index] << 8 | val[index + 1];
-      eventValue = val[index + 2] << 8 | val[index + 3];
-      onChanged(eventType, eventValue);
+      var ev = MicrobitEvent();
+      ev.type = val[index] << 8 | val[index + 1];
+      ev.value = val[index + 2] << 8 | val[index + 3];
+      onChanged(ev.type, ev.value);
     }
   });
+}
+
+void writeClientRequirements(
+    List<BluetoothService> services, List<MicrobitEvent> events) {
+  List<int> data = [];
+  var index = 0;
+  for (var item in events) {
+    data[index] = item.type >> 8;
+    data[index + 1] = item.type & 0xF0;
+    data[index + 2] = item.value >> 8;
+    data[index + 3] = item.value & 0xF0;
+  }
+  _write(services, EVENT_SRV, EVENT_CLIENTREQUIREMENTS, data);
+}
+
+void writeClientEvent(
+    List<BluetoothService> services, List<MicrobitEvent> events) {
+  List<int> data = [];
+  var index = 0;
+  for (var item in events) {
+    data[index] = item.type >> 8;
+    data[index + 1] = item.type & 0xF0;
+    data[index + 2] = item.value >> 8;
+    data[index + 3] = item.value & 0xF0;
+  }
+  _write(services, EVENT_SRV, EVENT_CLIENTEVENT, data);
 }
 
 void dumpService(BluetoothService service) {

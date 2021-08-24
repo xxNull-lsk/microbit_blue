@@ -43,7 +43,7 @@ class _GamepadPageState extends State<GamepadPage> {
     var services = await widget.device.discoverServices();
     Fluttertoast.showToast(msg: txt);
 
-    await uartSend(services, txt);
+    uartSend(services, txt);
   }
 
   void initLandScape() {
